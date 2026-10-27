@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetScan - Port Scanner</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b1120;
+            color: #e5e7eb;
+        }
+
+        header {
+            background: #111b30;
+            padding: 24px 7%;
+            border-bottom: 1px solid #26344d;
+        }
+
+        header h1 {
+            margin: 0;
+            color: #60a5fa;
+        }
+
+        header p, .note {
+            color: #94a3b8;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: #111b30;
+            border: 1px solid #26344d;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            margin: 16px 0 8px;
+        }
+
+        input {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 12px;
+            background: #0b1120;
+            border: 1px solid #35445e;
+            color: white;
+            border-radius: 6px;
+        }
+
+        .fields, .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        button {
+            margin-top: 22px;
+            width: 100%;
+            padding: 13px;
+            border: 0;
+            border-radius: 6px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .stats {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .stat {
+            background: #17243b;
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .error {
+            padding: 12px;
+            background: #451a1a;
+            color: #fecaca;
+            border-radius: 6px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 13px;
+            border-bottom: 1px solid #26344d;
+        }
+
+        th {
+            color: #93c5fd;
+        }
+
+        .open {
+            color: #4ade80;
+        }
+
+        .closed {
+            color: #fbbf24;
+        }
+
+        footer {
+            text-align: center;
+            color: #94a3b8;
+            padding: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .fields, .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>NetScan</h1>
+        <p>Python Network Port Scanner</p>
+    </header>
+
+    <main>
+        <section class="card">
+            <h2>Scan Configuration</h2>
+            <p class="note">
+                Scan only your own device or an authorized private
+                network target.
+            </p>
+
+            {% if error %}
+                <p class="error">{{ error }}</p>
+            {% endif %}
+
+            <form method="POST">
+                <label for="target">Target IP Address</label>
+                <input id="target" name="target"
+                       value="{{ target }}" required>
+
+                <div class="fields">
+                    <div>
+                        <label for="start_port">Start Port</label>
+                        <input id="start_port" name="start_port"
+                               type="number" min="1" max="1024"
+                               value="{{ start_port }}" required>
+                    </div>
+
+                    <div>
+                        <label for="end_port">End Port</label>
+                        <input id="end_port" name="end_port"
+                               type="number" min="1" max="1024"
+                               value="{{ end_port }}" required>
+                    </div>
+                </div>
+
+                <button type="submit">Start Port Scan</button>
+            </form>
+        </section>
+
+        {% if results %}
+        <section class="card">
+            <h2>Scan Summary</h2>
+
+            <div class="stats">
+                <div class="stat">
+                    <p>Target</p>
+                    <strong>{{ target }}</strong>
+                </div>
+
+                <div class="stat">
+                    <p>Ports Checked</p>
+                    <strong>{{ results|length }}</strong>
+                </div>
+
+                <div class="stat">
+                    <p>Open Ports</p>
+                    <strong>{{ open_count }}</strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Scan Results</h2>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Port</th>
+                            <th>Service</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for item in results %}
+                        <tr>
+                            <td>{{ item.port }}</td>
+                            <td>{{ item.service }}</td>
+                            <td class="{{ 'open' if item.status == 'Open' else 'closed' }}">
+                                {{ item.status }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        {% endif %}
+    </main>
+
+    <footer>Cyber Security Mini Project | Python + Flask</footer>
+</body>
+</html>
